@@ -35,8 +35,8 @@ export default function Main() {
         try {
             if(!resultObj) return;
             const Objdata = {
-                id: result.name,
-                words: result.words,
+                id: resultObj.name,
+                words: resultObj.words,
             }
             const response = await axios.post(pathname+`/caption`, Objdata);
             setIsCaption(true);
