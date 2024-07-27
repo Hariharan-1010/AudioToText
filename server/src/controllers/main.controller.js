@@ -36,8 +36,8 @@ const __dirname = dirname(__filename);
     };
     const audioToText = async () => {
         try {
-            const path = path.join(__dirname, prefixName+'audio.webm');
-            const audioData = await fs.readFile(path)
+            const pathName = path.join(__dirname, prefixName+'audio.webm');
+            const audioData = await fs.readFile(pathName)
             const uploadResponse = await axios.post(`${baseUrl}/upload`, audioData, {
                 headers
             })
