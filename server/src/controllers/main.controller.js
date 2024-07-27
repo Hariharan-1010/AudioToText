@@ -4,12 +4,14 @@ import fs from 'fs-extra'
 import 'dotenv/config'
 
 const API_KEY = process.env;
-console.log(API_KEY);
+
 export async function getAudioFile(req, res, next) {
+
+    const incomingUrl = req.query.url;
     const baseUrl = 'https://api.assemblyai.com/v2'
 
     const headers = {
-    authorization: API_KEY 
+    authorization: '66c7aaaf748145eeb825e51e00c3aa2b'
     }
 
     const downloadVideoAsMp3 = async (url, outputPath) => {
@@ -33,9 +35,7 @@ export async function getAudioFile(req, res, next) {
             })
             const uploadUrl = uploadResponse.data.upload_url;
             const data = {
-                audio_url: uploadUrl,
-                speech_model: 'nano',
-                language_code: 'ta' // You can also use a URL to an audio or video file on the web
+                audio_url: uploadUrl // You can also use a URL to an audio or video file on the web
               }
             const url = `${baseUrl}/transcript`
             const response = await axios.post(url, data, { headers: headers })              
@@ -63,9 +63,9 @@ export async function getAudioFile(req, res, next) {
             }
         }
 
-    const videoUrl = 'https://youtu.be/PiRW6KOaM5c?feature=shared';
+    // const videoUrl = 'https://youtu.be/PiRW6KOaM5c?feature=shared';
     const output = 'audio2.mp3';
     
-    downloadVideoAsMp3(videoUrl, output);
-    audioToText()
+    downloadVideoAsMp3(incomingUrl, output);
+    setTimeout(audioToText, 1000);
 }
