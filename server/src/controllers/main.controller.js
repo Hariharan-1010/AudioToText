@@ -30,6 +30,7 @@ const __dirname = dirname(__filename);
         console.log('Download and conversion to MP3 completed');
       } catch (error) {
         console.error('Error downloading or converting video:', error);
+        return;
       } finally {
         audioToText()
       }
