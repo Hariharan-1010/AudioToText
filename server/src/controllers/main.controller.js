@@ -36,7 +36,7 @@ const __dirname = dirname(__filename);
     };
     const audioToText = async () => {
         try {
-            const pathName = path.join(__dirname);
+            const pathName = './audio.mp3;
             const audioData = await fs.readFile(pathName)
             const uploadResponse = await axios.post(`${baseUrl}/upload`, audioData, {
                 headers
@@ -76,7 +76,7 @@ const __dirname = dirname(__filename);
             }
         }
     
-    downloadVideoAsMp3(incomingUrl,path.join(__dirname));
+    downloadVideoAsMp3(incomingUrl,output);
 }
 
 export async function exportCaption(req, res, next) {
