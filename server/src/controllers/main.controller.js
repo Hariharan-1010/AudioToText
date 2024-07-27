@@ -36,7 +36,7 @@ const __dirname = dirname(__filename);
     };
     const audioToText = async () => {
         try {
-            const pathName = './audio.mp3;
+            const pathName = './audio.mp3';
             const audioData = await fs.readFile(pathName)
             const uploadResponse = await axios.post(`${baseUrl}/upload`, audioData, {
                 headers
