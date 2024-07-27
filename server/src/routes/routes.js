@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAudioFile } from '../controllers/main.controller.js';
+import { exportCaption, getAudioFile } from '../controllers/main.controller.js';
 
 const router = express.Router();
 
@@ -8,6 +8,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/atot", getAudioFile);
+router.post("/caption", exportCaption);
 
 
 export default router;

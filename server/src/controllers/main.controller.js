@@ -3,15 +3,17 @@ import axios from 'axios'
 import fs from 'fs-extra'
 import 'dotenv/config'
 
-const API_KEY = process.env;
+const API_KEY = process.env.API_KEY;
 
 export async function getAudioFile(req, res, next) {
-
+    const prefixName = Date.now();
+    
+    const output = 'audio.mp3';
     const incomingUrl = req.query.url;
     const baseUrl = 'https://api.assemblyai.com/v2'
 
     const headers = {
-    authorization: '66c7aaaf748145eeb825e51e00c3aa2b'
+    authorization: API_KEY
     }
 
     const downloadVideoAsMp3 = async (url, outputPath) => {
@@ -24,11 +26,13 @@ export async function getAudioFile(req, res, next) {
         console.log('Download and conversion to MP3 completed');
       } catch (error) {
         console.error('Error downloading or converting video:', error);
+      } finally {
+        audioToText()
       }
     };
     const audioToText = async () => {
         try {
-            const path = './audio2.webm';
+            const path = './'+prefixName+'audio.webm';
             const audioData = await fs.readFile(path)
             const uploadResponse = await axios.post(`${baseUrl}/upload`, audioData, {
                 headers
@@ -41,6 +45,7 @@ export async function getAudioFile(req, res, next) {
             const response = await axios.post(url, data, { headers: headers })              
             const transcriptId = response.data.id
             const pollingEndpoint = `${baseUrl}/transcript/${transcriptId}`
+            const returnData = {text: "ENOENT", name: prefixName+'audio.webm', words: []};
 
             while (true) {
                 const pollingResponse = await axios.get(pollingEndpoint, {
@@ -49,6 +54,9 @@ export async function getAudioFile(req, res, next) {
                 const transcriptionResult = pollingResponse.data
 
                 if (transcriptionResult.status === 'completed') {
+                    returnData.text = transcriptionResult.text;
+                    returnData.words = transcriptionResult.words;
+                    res.status(200).json({data: returnData});
                     console.log(transcriptionResult.text)
                     console.log("\ndone\n");
                     break
@@ -60,12 +68,46 @@ export async function getAudioFile(req, res, next) {
             }
             } catch (error) {
                 console.log(error);
+                next(error);
             }
         }
-
-    // const videoUrl = 'https://youtu.be/PiRW6KOaM5c?feature=shared';
-    const output = 'audio2.mp3';
     
-    downloadVideoAsMp3(incomingUrl, output);
-    setTimeout(audioToText, 1000);
+    downloadVideoAsMp3(incomingUrl,prefixName+output);
+}
+
+export async function exportCaption(req, res, next) {
+    try {
+        const createSRT = (words, outputPath) => {
+            let srt = '';
+            let index = 1;
+          
+            words.forEach(wordInfo => {
+              const startTime = new Date(wordInfo.start * 1000).toISOString().substr(11, 12).replace('.', ',');
+              const endTime = new Date(wordInfo.end * 1000).toISOString().substr(11, 12).replace('.', ',');
+          
+              srt += `${index}\n${startTime} --> ${endTime}\n${wordInfo.text}\n\n`;
+              index++;
+            });
+          
+            fs.writeFileSync(outputPath, srt);
+            console.log('SRT file generation completed');
+          };
+          
+          const main = async () => {
+            try {
+                const audioName = req.body.id;
+                const words  = req.body.words;
+                console.log(words);
+                console.log(req.body);
+                createSRT(words, audioName+'file.srt');
+            } catch (error) {
+              console.error('Error:', error);
+            }
+          };
+          
+          main();
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
 }
