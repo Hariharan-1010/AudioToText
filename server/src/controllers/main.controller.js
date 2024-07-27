@@ -4,7 +4,7 @@ import fs from 'fs-extra'
 import 'dotenv/config'
 
 const API_KEY = process.env;
-
+console.log(API_KEY);
 export async function getAudioFile(req, res, next) {
     const baseUrl = 'https://api.assemblyai.com/v2'
 
@@ -50,6 +50,7 @@ export async function getAudioFile(req, res, next) {
 
                 if (transcriptionResult.status === 'completed') {
                     console.log(transcriptionResult.text)
+                    console.log("\ndone\n");
                     break
                 } else if (transcriptionResult.status === 'error') {
                     throw new Error(`Transcription failed: ${transcriptionResult.error}`)
