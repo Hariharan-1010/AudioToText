@@ -2,11 +2,15 @@ import React from "react";
 import { useState } from "react";
 import axios from 'axios';
 
+
+
+
 export default function Main() {
+    
     const [result, setResult] = useState("");
     const [resultObj, setResultObj] = useState({});
     const [isCaption, setIsCaption] = useState(false);
-    const pathname  = "http://localhost:8080";
+    const pathname  = "https://youtubetotexttocaptionapi.onrender.com";
     function isValidUrl(string) {
         try {
           new URL(string);

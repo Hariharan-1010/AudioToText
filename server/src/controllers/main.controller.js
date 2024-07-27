@@ -2,12 +2,16 @@ import youtubedl from 'youtube-dl-exec';
 import axios from 'axios'
 import fs from 'fs-extra'
 import 'dotenv/config'
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { dirname } from 'path';
 
 const API_KEY = process.env.API_KEY;
 
 export async function getAudioFile(req, res, next) {
+  const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
     const prefixName = Date.now();
-    
     const output = 'audio.mp3';
     const incomingUrl = req.query.url;
     const baseUrl = 'https://api.assemblyai.com/v2'
@@ -32,7 +36,7 @@ export async function getAudioFile(req, res, next) {
     };
     const audioToText = async () => {
         try {
-            const path = './'+prefixName+'audio.webm';
+            const path = path.join(__dirname, prefixName+'audio.webm');
             const audioData = await fs.readFile(path)
             const uploadResponse = await axios.post(`${baseUrl}/upload`, audioData, {
                 headers
@@ -72,7 +76,7 @@ export async function getAudioFile(req, res, next) {
             }
         }
     
-    downloadVideoAsMp3(incomingUrl,prefixName+output);
+    downloadVideoAsMp3(incomingUrl,path.join(__dirname, prefixName+output));
 }
 
 export async function exportCaption(req, res, next) {
